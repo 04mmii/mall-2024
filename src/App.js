@@ -2,15 +2,18 @@ import { useState } from 'react';
 import './App.css';
 import { Navbar, Container, Nav } from 'react-bootstrap';
 import data from './data.js';
-import { Routes, Route, Link, useNavigate, Outlet } from 'react-router-dom';
+import { Routes, Route,  useNavigate, Outlet } from 'react-router-dom';
 import Detail from './pages/Detail.js';
+import aios from 'axios';
+import Cart from './pages/Cart.js';
 
 
 
 function App() {
 
-  let [ shose ] = useState(data);
+  let [ shose, setShoes ] = useState(data);
   let navigate  = useNavigate();
+
 
   return (
     <div className="App">
@@ -21,8 +24,9 @@ function App() {
           <Navbar.Brand href="/">Shose MALL</Navbar.Brand>
           <Nav className="me-auto">
             <Nav.Link href="/">Home</Nav.Link>
-            <Nav.Link onClick={()=> { navigate('/detail') }}>Detail</Nav.Link>
+            <Nav.Link onClick={()=> { navigate('/detail/0') }}>Detail</Nav.Link>
             <Nav.Link onClick={()=> { navigate('/event') }}>Event</Nav.Link>
+            <Nav.Link onClick={()=> { navigate('/cart') }}>Cart</Nav.Link>
           </Nav>
         </Container>
       </Navbar>
@@ -42,17 +46,26 @@ function App() {
                   }
                 </div>
               </div>
+              <button onClick={()=>{
+                aios.get('https://codingapple1.github.io/shop/data2.json')
+                .then((결과)=>{ 
+                  let copy = [...shose, ...결과.data]
+                  setShoes(copy)
+                 })
+                 .catch(()=> {
+                  console.log('실패함')
+                 })
+              }}>버튼</button>
           </div>
         }/>
-        <Route path="/detail" element={<Detail />}/>
-        <Route path="/event" element={<Event />}>
-          <Route path="one" element={<div>첫 주문시 양배추즙 서비스</div>}/>
-          <Route path="two" element={<div>생일기념 쿠폰받기</div>}/>
-
-        </Route>
+        <Route path="/detail/:id" element={<Detail shose={shose} />}/>
+        <Route path="/event" element={<Event />}/>
+        <Route path="/cart" element={<Cart />} />
 
         <Route path="*" element={<div>없는 페이지입니다</div>}/>
       </Routes>
+
+
 
     </div> 
   );
